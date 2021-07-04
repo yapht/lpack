@@ -4,9 +4,17 @@
 #include <stdio.h>
 #include <assert.h>
 
+#ifndef LUAJIT
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
+#else
+#include <luajit/lua.h>
+#include <luajit/lauxlib.h>
+#include <luajit/lualib.h>
+#include <luajit/luajit.h>
+#define LUA_OK 0
+#endif
 
 #include <Windows.h>
 
@@ -76,7 +84,7 @@ int main(int argc, char** argv)
     if (!find_bytecode_resource(&bc, &bc_size))
         return 1;
 
-    bytecode_info info = { .data = bc, .size = bc_size };
+    bytecode_info info = { bc, bc_size };
 
     lua_State* L = luaL_newstate();
     if (!L)
@@ -87,8 +95,13 @@ int main(int argc, char** argv)
 
     luaL_openlibs(L);
 
+
     // Load the bytecode in 'bt' mode
+#ifndef LUAJIT
     int status = lua_load(L, (lua_Reader)bc_reader, (void*)&info, "program", 0);
+#else
+    int status = lua_load(L, (lua_Reader)bc_reader, (void*)&info, "program");
+#endif
 
     if (status != LUA_OK)
     {

@@ -52,7 +52,11 @@ bool compiler::compile_bytecode(const std::string& path, bcbuffer* buf, bool str
     }
 
     // Write the bytecode to our buffer
+#ifndef LUAJIT
     status = lua_dump(L, bc_writer, buf, strip_debug_info);
+#else
+    status = lua_dump(L, bc_writer, buf);
+#endif
 
     if (status != 0)
     {

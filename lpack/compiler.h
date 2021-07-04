@@ -1,5 +1,11 @@
 #pragma once
+
+#ifndef LUAJIT
 #include <lua.hpp>
+#else
+#include <luajit/lua.hpp>
+#define LUA_OK 0
+#endif
 #include <string>
 
 namespace compiler
